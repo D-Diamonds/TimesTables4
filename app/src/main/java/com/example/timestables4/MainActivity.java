@@ -14,13 +14,20 @@ import java.util.ArrayList;
 
 
 /*
-
-    As of the time of this comment the app creates a times table up to the int value in the randomize funtion...
-    it is possible i made user input for this by the time i submit and forgot to change this comment.
-    The randomize() function creates a random list of Times Table pairs with no duplicates
+    The app starts by asking the user for a max value of the times table
+        Note: This app could do larger values but for runtime issues it is maxxed at 100
+    After inputting a valid number (it only takes positive integers) and clicking start
+    the text and start button become invisible and check, restart, two numbers, symbol,
+    and pairs left views become visible
+    The randomize() function creates a random list of Times Table pairs with no duplicates to use
     The changePair() function displays a new pair to the screen
+    The two visibility functions just reverse visibility of the given states
+    Each pair is a TimesPair, which contains two numbers and their product
+    When a user guesses correctly a new pair is shown and the previous is removed from the deck
+    Once a guess is made right/wrong a new pair is displayed
+    When everything is guessed correctly a Completed msg displays
 
-
+    Null input, decimals, and negative numbers are not possible as of testing
 
  */
 
@@ -93,14 +100,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void changePair() {
-        TextView remainingText = findViewById(R.id.remainingText);
-        remainingText.setText("Pairs remaining: " + this.timesTable.size());
+        updateRemainder();
         TextView textNum1 = findViewById(R.id.num1);
         TextView textNum2 = findViewById(R.id.num2);
         this.currentPairIndex = (int) (Math.random() * this.timesTable.size());
         this.currentPair = this.timesTable.get(this.currentPairIndex);
         textNum1.setText(Integer.toString(this.currentPair.getNum1()));
         textNum2.setText(Integer.toString(this.currentPair.getNum2()));
+    }
+
+    public void updateRemainder() {
+        TextView remainingText = findViewById(R.id.remainingText);
+        remainingText.setText("Pairs remaining: " + this.timesTable.size());
     }
 
     public void onClick(View view) {
@@ -113,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     this.timesTable.remove(this.currentPairIndex);
                 }
                 input.setText("");
+                updateRemainder();
                 if (this.timesTable.size() == 0) {
                     completeText.setVisibility(View.VISIBLE);
                     TextView text = findViewById(R.id.num1);
@@ -122,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else
                     changePair();
-                System.out.println(this.timesTable.size());
+                //System.out.println(this.timesTable.size());
             }
         }
 
@@ -137,9 +149,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId() == findViewById(R.id.startBtn).getId()) {
             if (!input.getText().toString().equals("")) {
                 this.maxValue = Integer.parseInt(input.getText().toString());
-                randomize();
-                changeGameVisibility(true);
-                changeStartVisibility(false);
+                if (this.maxValue < 100) {
+                    randomize();
+                    changeGameVisibility(true);
+                    changeStartVisibility(false);
+                }
                 input.setText("");
             }
         }

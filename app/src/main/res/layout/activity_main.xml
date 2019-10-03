@@ -112,7 +112,7 @@
         android:id="@+id/maxValueText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter max value:"
+        android:text="Enter max value (Below 100):"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
