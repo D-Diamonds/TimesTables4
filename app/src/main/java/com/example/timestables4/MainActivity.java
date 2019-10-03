@@ -3,12 +3,180 @@ package com.example.timestables4;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+
+/*
+
+    As of the time of this comment the app creates a times table up to the int value in the randomize funtion...
+    it is possible i made user input for this by the time i submit and forgot to change this comment.
+    The randomize() function creates a random list of Times Table pairs with no duplicates
+    The changePair() function displays a new pair to the screen
+
+
+
+ */
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private ArrayList<TimesPair> timesTable;
+    private TimesPair currentPair;
+    private int currentPairIndex;
+    private int maxValue = 0;
+
+
+    private void randomize() {
+        this.timesTable = new ArrayList<>();
+
+
+        for (int i = 0; i <= this.maxValue; i++) {
+            for (int j = i; j <= this.maxValue; j++) {
+                TimesPair pair = new TimesPair(i, j);
+                this.timesTable.add(pair);
+                //System.out.println(pair);
+            }
+        }
+
+        ArrayList<TimesPair> temp = new ArrayList<>();
+        for (int i = 0; i < this.timesTable.size(); i++) {
+            int index = (int) (Math.random() * this.timesTable.size());
+            temp.add(this.timesTable.get(index));
+            this.timesTable.remove(index);
+            i--;
+        }
+        this.timesTable = temp;
+        changeStartVisibility(false);
+        changeGameVisibility(true);
+        changePair();
+    }
+
+    public void changeGameVisibility(boolean bool) {
+        int visible;
+        if (bool)
+            visible = View.VISIBLE;
+        else
+            visible = View.INVISIBLE;
+
+        TextView textNum1 = findViewById(R.id.num1);
+        TextView textNum2 = findViewById(R.id.num2);
+        TextView symbol = findViewById(R.id.multiplySymbol);
+        TextView remainingText = findViewById(R.id.remainingText);
+        Button checkBtn = findViewById(R.id.checkBtn);
+        Button restartBtn = findViewById(R.id.restartBtn);
+        textNum1.setVisibility(visible);
+        textNum2.setVisibility(visible);
+        remainingText.setVisibility(visible);
+        symbol.setVisibility(visible);
+        checkBtn.setVisibility(visible);
+        restartBtn.setVisibility(visible);
+    }
+
+    public void changeStartVisibility(boolean bool) {
+        int visible;
+        if (bool)
+            visible = View.VISIBLE;
+        else
+            visible = View.INVISIBLE;
+
+        TextView maxValueText = findViewById(R.id.maxValueText);
+        Button startBtn = findViewById(R.id.startBtn);
+        maxValueText.setVisibility(visible);
+        startBtn.setVisibility(visible);
+
+    }
+
+    public void changePair() {
+        TextView remainingText = findViewById(R.id.remainingText);
+        remainingText.setText("Pairs remaining: " + this.timesTable.size());
+        TextView textNum1 = findViewById(R.id.num1);
+        TextView textNum2 = findViewById(R.id.num2);
+        this.currentPairIndex = (int) (Math.random() * this.timesTable.size());
+        this.currentPair = this.timesTable.get(this.currentPairIndex);
+        textNum1.setText(Integer.toString(this.currentPair.getNum1()));
+        textNum2.setText(Integer.toString(this.currentPair.getNum2()));
+    }
+
+    public void onClick(View view) {
+
+        EditText input = findViewById(R.id.input);
+        TextView completeText = findViewById(R.id.completeText);
+        if (view.getId() == findViewById(R.id.checkBtn).getId()) {
+            if (!input.getText().toString().equals("")) {
+                if (Integer.parseInt(input.getText().toString()) == this.currentPair.getProduct()) {
+                    this.timesTable.remove(this.currentPairIndex);
+                }
+                input.setText("");
+                if (this.timesTable.size() == 0) {
+                    completeText.setVisibility(View.VISIBLE);
+                    TextView text = findViewById(R.id.num1);
+                    text.setText("-");
+                    text = findViewById(R.id.num2);
+                    text.setText("-");
+                }
+                else
+                    changePair();
+                System.out.println(this.timesTable.size());
+            }
+        }
+
+        if (view.getId() == findViewById(R.id.restartBtn).getId()) {
+            //randomize();
+            changeGameVisibility(false);
+            changeStartVisibility(true);
+            completeText.setVisibility(View.INVISIBLE);
+            input.setText("");
+        }
+
+        if (view.getId() == findViewById(R.id.startBtn).getId()) {
+            if (!input.getText().toString().equals("")) {
+                this.maxValue = Integer.parseInt(input.getText().toString());
+                randomize();
+                changeGameVisibility(true);
+                changeStartVisibility(false);
+                input.setText("");
+            }
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        changeGameVisibility(false);
+        changeStartVisibility(true);
+
+
+        final Button checkBtn = findViewById(R.id.checkBtn);
+        Button restartBtn = findViewById(R.id.restartBtn);
+        final Button startBtn = findViewById(R.id.startBtn);
+        EditText input = findViewById(R.id.input);
+        startBtn.setOnClickListener(this);
+        checkBtn.setOnClickListener(this);
+        restartBtn.setOnClickListener(this);
+
+
+        // Allows the use of enter instead of clicking check for ease of use
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) || actionId == EditorInfo.IME_ACTION_DONE) {
+                    //do what you want on the press of 'done'
+                    if (findViewById(R.id.checkBtn).getVisibility() == View.VISIBLE)
+                        checkBtn.performClick();
+                    else
+                        startBtn.performClick();
+                }
+                return false;
+            }
+        });
+
     }
 }
