@@ -15,8 +15,9 @@ import java.util.ArrayList;
 
 /*
     The app starts by asking the user for a max value of the times table
-        Note: This app could do larger values but for runtime issues it is maxxed at 100
+        Note: This app could do larger values but for runtime issues it is maxed at 100
     After inputting a valid number (it only takes positive integers) and clicking start
+    isNumeric() checks for valid number input and null input
     the text and start button become invisible and check, restart, two numbers, symbol,
     and pairs left views become visible
     The randomize() function creates a random list of Times Table pairs with no duplicates to use
@@ -27,21 +28,21 @@ import java.util.ArrayList;
     Once a guess is made right/wrong a new pair is displayed
     When everything is guessed correctly a Completed msg displays
 
-    Null input, decimals, and negative numbers are not possible as of testing
+    Null input, decimals, and negative numbers are not possible to input
 
  */
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    // Variables used throughout the app
     private ArrayList<TimesPair> timesTable;
     private TimesPair currentPair;
     private int currentPairIndex;
     private int maxValue = 0;
 
-
+    // Creates the times table in a randomized list
     private void randomize() {
         this.timesTable = new ArrayList<>();
-
 
         for (int i = 0; i <= this.maxValue; i++) {
             for (int j = i; j <= this.maxValue; j++) {
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         changePair();
     }
 
+    // Changes game screen visibility
     public void changeGameVisibility(boolean bool) {
         int visible;
         if (bool)
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         restartBtn.setVisibility(visible);
     }
 
+    // Changes start screen visibility
     public void changeStartVisibility(boolean bool) {
         int visible;
         if (bool)
@@ -96,9 +99,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button startBtn = findViewById(R.id.startBtn);
         maxValueText.setVisibility(visible);
         startBtn.setVisibility(visible);
-
     }
 
+    // Changes pair after guess
     public void changePair() {
         updateRemainder();
         TextView textNum1 = findViewById(R.id.num1);
@@ -109,15 +112,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textNum2.setText(Integer.toString(this.currentPair.getNum2()));
     }
 
+    // Updates remaining pairs text
     public void updateRemainder() {
         TextView remainingText = findViewById(R.id.remainingText);
         remainingText.setText("Pairs remaining: " + this.timesTable.size());
     }
 
+    // onClick functionality
     public void onClick(View view) {
 
         EditText input = findViewById(R.id.input);
         TextView completeText = findViewById(R.id.completeText);
+
+        // Check Button onClick()
         if (view.getId() == findViewById(R.id.checkBtn).getId()) {
             String number = input.getText().toString();
                 if (isNumeric(number) && Integer.parseInt(number) == this.currentPair.getProduct()) {
@@ -137,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //System.out.println(this.timesTable.size());
         }
 
+        // Restart Button onClick()
         if (view.getId() == findViewById(R.id.restartBtn).getId()) {
             //randomize();
             changeGameVisibility(false);
@@ -145,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             input.setText("");
         }
 
+        // Start Button onClick()
         if (view.getId() == findViewById(R.id.startBtn).getId()) {
             String number = input.getText().toString();
                 if (isNumeric(number)) {
@@ -159,10 +168,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // Tests for valid number
     public static boolean isNumeric(String strNum) {
         try {
-            int i = Integer.parseInt(strNum);
-        } catch (NumberFormatException | NullPointerException e) {
+            Integer.parseInt(strNum);
+        }
+        catch (NumberFormatException | NullPointerException e) {
             return false;
         }
         return true;
@@ -174,24 +185,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Start on setup screen
         changeGameVisibility(false);
         changeStartVisibility(true);
 
-
+        // Listener setup
         final Button checkBtn = findViewById(R.id.checkBtn);
-        Button restartBtn = findViewById(R.id.restartBtn);
-        final Button startBtn = findViewById(R.id.startBtn);
-        EditText input = findViewById(R.id.input);
-        startBtn.setOnClickListener(this);
         checkBtn.setOnClickListener(this);
+
+        Button restartBtn = findViewById(R.id.restartBtn);
         restartBtn.setOnClickListener(this);
 
+        final Button startBtn = findViewById(R.id.startBtn);
+        startBtn.setOnClickListener(this);
 
-        // Allows the use of enter instead of clicking check for ease of use
+        EditText input = findViewById(R.id.input);
+
+        // Allows keyboard use
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) || actionId == EditorInfo.IME_ACTION_DONE) {
-                    //do what you want on the press of 'done'
                     if (findViewById(R.id.checkBtn).getVisibility() == View.VISIBLE)
                         checkBtn.performClick();
                     else
@@ -200,6 +213,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
-
     }
 }
