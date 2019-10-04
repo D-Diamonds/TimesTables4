@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EditText input = findViewById(R.id.input);
         TextView completeText = findViewById(R.id.completeText);
         if (view.getId() == findViewById(R.id.checkBtn).getId()) {
-            if (!input.getText().toString().equals("")) {
-                if (Integer.parseInt(input.getText().toString()) == this.currentPair.getProduct()) {
+            String number = input.getText().toString();
+                if (isNumeric(number) && Integer.parseInt(number) == this.currentPair.getProduct()) {
                     this.timesTable.remove(this.currentPairIndex);
                 }
                 input.setText("");
@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else
                     changePair();
                 //System.out.println(this.timesTable.size());
-            }
         }
 
         if (view.getId() == findViewById(R.id.restartBtn).getId()) {
@@ -147,16 +146,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (view.getId() == findViewById(R.id.startBtn).getId()) {
-            if (!input.getText().toString().equals("")) {
-                this.maxValue = Integer.parseInt(input.getText().toString());
-                if (this.maxValue < 100) {
-                    randomize();
-                    changeGameVisibility(true);
-                    changeStartVisibility(false);
+            String number = input.getText().toString();
+                if (isNumeric(number)) {
+                    this.maxValue = Integer.parseInt(number);
+                    if (this.maxValue < 100) {
+                        randomize();
+                        changeGameVisibility(true);
+                        changeStartVisibility(false);
+                    }
                 }
                 input.setText("");
-            }
         }
+    }
+
+    public static boolean isNumeric(String strNum) {
+        try {
+            int i = Integer.parseInt(strNum);
+        } catch (NumberFormatException | NullPointerException e) {
+            return false;
+        }
+        return true;
     }
 
 
